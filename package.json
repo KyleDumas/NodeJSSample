@@ -1,0 +1,24 @@
+{
+  "name": "NodeJsWebApplication",
+  "version": "1.0.0",
+  "keywords": [
+    "util",
+    "functional",
+    "server",
+    "client",
+    "browser"
+  ],
+  "main": "main.js",
+  "author": "Kyle Dumas",
+  "contributors": [],
+  "dependencies": {
+    "angular": "^1.5.5",
+    "chart.js": "^2.0.2",
+    "jquery": "^2.2.3",
+    "open": "0.0.5"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "electron-prebuilt": "^0.37.7"
+  }
+}

@@ -1,0 +1,47 @@
+.screenHeader {
+    text-align: center;
+    font-weight: bold;
+    font-size: 14pt;
+}
+
+.sectionHeader {
+    text-align: left;
+    font-weight: bold;
+    font-size: 12pt;
+    padding-left: 0px;
+}
+
+.lineHeader {
+    text-align: right;
+    padding-right: 0px;
+    line-height: 32px;
+}
+
+.lineHeader label {
+    font-weight: normal;
+}
+
+.row {
+    margin-bottom: 3px;
+}
+
+.actionButtons {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.lineScale {
+    padding-top: 10px;
+}
+
+#noteText {
+    font-weight: bold;
+    padding-top: 15px;
+}
+
+.green {
+    color: green;
+}
+.red {
+    color: red;
+}

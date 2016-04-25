@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<!--
+Note: Not using any cdns in-case application is ran offline.
+-->
+<html>
+    <head>
+        <title>Compound Interest Calculator</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="thirdparty/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="css/main.css">
+        <link rel="stylesheet" href="thirdparty/jQueryUI/css/jquery-ui.css">
+        <!-- jQuery with electron requires the following otherwise it ignores window -->
+        <script src="thirdparty/jQuery/js/jquery.min.js" onload="if (typeof module !== 'undefined' && module.exports) {window.$ = window.jQuery = module.exports;}"></script>
+        <script src="thirdparty/jQueryUI/js/jquery-ui.min.js"></script>
+        <script src="thirdparty/bootstrap/js/bootstrap.min.js"></script>
+        <script src="js/interestCalculator.js"></script>
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="col-xs-12 screenHeader">
+                Compound Interest Calculator - Savings Account
+            </div>
+            <div class="col-xs-12 col-md-6">
+                <form id="calcForm">
+                    <div class="col-xs-12 sectionHeader">Savings Inputs:</div>
+
+                    <!-- Starting Amount -->
+                    <div class="row">
+                        <div class="col-xs-3 lineHeader">
+                            <label for="startAmount">Starting Amount</label>
+                        </div>
+                        <div class="col-xs-4 lineInput">
+                            <div class="input-group">
+                                <div class="input-group-addon">$</div>
+                                <input type="text" class="form-control" id="startAmount" name="startAmount" value="1000" ng-model="startAmount">
+                                <div class="input-group-addon">.00</div>
+                            </div>
+                        </div>
+                        <div class="col-xs-5 lineScale">
+                            <div id="startRange"></div>
+                        </div>
+                    </div>
+
+                    <!-- Years to Save -->
+                    <div class="row">
+                        <div class="col-xs-3 lineHeader">
+                            <label for="years">Years to Save</label>
+                        </div>
+                        <div class="col-xs-4 lineInput">
+                            <input type="text" class="form-control" id="years" name="years" value="10" ng-model="years">
+                        </div>
+                        <div class="col-xs-5 lineScale">
+                            <div id="yearRange"></div>
+                        </div>
+                    </div>
+
+                    <!-- Rate of Return -->
+                    <div class="row">
+                        <div class="col-xs-3 lineHeader">
+                            <label for="rate">Rate of Return</label>
+                        </div>
+                        <div class="col-xs-4 lineInput">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="rate" name="rate" value="0.25" ng-model="rate">
+                                <div class="input-group-addon">%</div>
+                            </div>
+                        </div>
+                        <div class="col-xs-5 lineScale">
+                            <div id="rateRange"></div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Contributions -->
+                    <div class="row">
+                        <div class="col-xs-3 lineHeader">
+                            <label for="additional">Additional Contributions</label>
+                        </div>
+                        <div class="col-xs-4 lineInput">
+                            <div class="input-group">
+                                <div class="input-group-addon">$</div>
+                                <input type="text" class="form-control" id="additional" name="additional" value="50" ng-model="additional">
+                                <div class="input-group-addon">.00</div>
+                            </div>
+                        </div>
+                        <div class="col-xs-5 lineScale">
+                            <div id="additionalRange"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-xs-12 col-md-6">
+                <div class="col-xs-12 sectionHeader">Balance by Year:</div>
+                <div class="col-xs-12">
+                    <canvas id="returnChart" class="col-xs-12"></canvas>
+                </div>
+            </div>
+            <div class="col-xs-6" id="noteText"></div>
+            <div class="col-xs-6 actionButtons">
+                <button type="button" class="btn btn-info" id="resetButton">Reset</button>
+                <button type="button" class="btn btn-success" id="calculateButton">Calculate</button>
+            </div>
+        </div>
+
+        <script src="thirdparty/chartJS/js/Chart.min.js"></script>
+        <script>
+            if (typeof module !== 'undefined' && module.exports) {
+                var shell = require('electron').shell;
+                //open links externally by default
+                $(document).on('click', 'a[href^="http"]', function (event) {
+                    event.preventDefault();
+                    shell.openExternal(this.href);
+                });
+            }
+            $("#calculateButton").on("click", function() {
+                updateChart();
+            });
+            $("#resetButton").on("click", function() {
+                $("#startAmount").val("1000");
+                $("#startRange").slider('value',1000);
+
+                $("#years").val("10");
+                $("#yearRange").slider('value',10);
+
+                $("#rate").val("0");
+                $("#rateRange").slider('value',0.25);
+
+                $("#additional").val("50");
+                $("#additionalRange").slider('value',50);
+                updateChart();
+            });
+            $(function() {
+                $( "#startRange" ).slider({
+                    range: "min",
+                    value: 1000,
+                    min: 1,
+                    max: 100000,
+                    slide: function( event, ui ) {
+                        $( "#startAmount" ).val( ui.value );
+                    }
+                });
+                $( "#yearRange" ).slider({
+                    range: "min",
+                    value: 10,
+                    min: 1,
+                    max: 100,
+                    slide: function( event, ui ) {
+                        $( "#years" ).val( ui.value );
+                    }
+                });
+                $( "#rateRange" ).slider({
+                    range: "min",
+                    step: 0.01,
+                    value: 0.25,
+                    min: 0,
+                    max: 12,
+                    slide: function( event, ui ) {
+                        $( "#rate" ).val( ui.value );
+                    }
+                });
+                $( "#additionalRange" ).slider({
+                    range: "min",
+                    value: 50,
+                    min: 0,
+                    max: 20000,
+                    slide: function( event, ui ) {
+                        $( "#additional" ).val( ui.value );
+                    }
+                });
+                updateChart();
+            });
+
+            function updateChart() {
+                interestCalculator.calculate(parseFloat($("#startAmount").val()), parseInt($("#years").val()), parseFloat($("#rate").val()), parseFloat($("#additional").val()));
+                console.log(interestCalculator.getData());
+                // Bar Chart
+                var ctx = document.getElementById("returnChart");
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: interestCalculator.getYearsArray(),
+                        datasets: [{
+                            label: 'Balance',
+                            data: interestCalculator.getData()
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero:true
+                                }
+                            }]
+                        }
+                    }
+                });
+            }
+        </script>
+    </body>
+</html>
